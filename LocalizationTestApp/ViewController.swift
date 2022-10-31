@@ -2,11 +2,17 @@ import Combine
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     // TODO: шаблоны на nsdateformatter.com
     private let template = "dMMMMyEEEE"
     private var value1: Measurement<UnitLength>?
+    private var value1Data: Double?
+    private var value1Type: UnitLength = .kilometers
     private var value2: Measurement<UnitLength>?
+    private var value2Data: Double?
+    private var value2Type: UnitLength = .miles
+    
+    // MARK: - UI
     
     private let upperContainerView = UIFactory.view
     private let lowerContainerView = UIFactory.view
@@ -21,6 +27,20 @@ class ViewController: UIViewController {
     private let measureValue2SegmentedControl = UIFactory.measureValue2SegmentedControl
     private let resultMeasureLabel = UIFactory.resultLabel
     
+    // MARK: - Combine
+    
+    @Published var isValue1Filled = false
+    @Published var isValue2Filled = false
+    
+    private var isReadyToCalculate: AnyPublisher<Bool, Never> {
+        Publishers.CombineLatest($isValue1Filled, $isValue2Filled)
+            .map { value1, value2 in
+                return value1 && value2
+            }.eraseToAnyPublisher()
+    }
+    
+    private var labelSubscriber: AnyCancellable?
+    
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
@@ -28,6 +48,7 @@ class ViewController: UIViewController {
         
         setupDesign()
         addTargets()
+        setupSubscriber()
         setupLayout()
     }
     
@@ -50,8 +71,101 @@ class ViewController: UIViewController {
         measureValue1SegmentedControl.addTarget(self, action: #selector(changeMeasureValue1Type(_:)), for: .valueChanged)
         measureValue2SegmentedControl.addTarget(self, action: #selector(changeMeasureValue2Type(_:)), for: .valueChanged)
     }
+    
+    private func getLocale(dependsOf index: Int) -> Locale {
+        var locale = Locale(identifier: "ru_RU")
+        switch index {
+        case 0: locale = Locale(identifier: "ru_RU")
+        case 1: locale = Locale(identifier: "en")
+        case 2: locale = Locale(identifier: "zh_CN")
+        case 3: locale = Locale(identifier: "ja")
+        case 4: locale = Locale(identifier: "de_DE")
+        case 5: locale = Locale(identifier: "it")
+        default: locale = Locale(identifier: "el")
+        }
+        return locale
+    }
+    
+    private func getLocalizedText(from optionalText: String?) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd/MM/yyyy"
+        
+        guard let text = optionalText,
+              let date = dateFormatter.date(from: text) else {
+            return "Check input data 🤷‍♀️"
+        }
+        let locale = getLocale(dependsOf: localizeSegmentedControl.selectedSegmentIndex)
+        dateFormatter.locale = locale
+        dateFormatter.setLocalizedDateFormatFromTemplate(template)
+        return dateFormatter.string(from: date)
+    }
+    
+    private func setupSubscriber() {
+        labelSubscriber = isReadyToCalculate
+            .receive(on: RunLoop.main)
+            .sink(receiveValue: { isReady in
+                self.resultMeasureLabel.text = isReady ? self.getCalculationResult() : "Check input data 🤷‍♀️"
+            })
+    }
+    
+    private func getCalculationResult() -> String {
+        let measureResult = value1! + value2!
+        let ru = Locale(identifier: "ru_RU")
+        let measureFormatter = MeasurementFormatter()
+        measureFormatter.locale = ru
+        return measureFormatter.string(from: measureResult)
+    }
+    
+    // MARK: - Actions
+    
+    @objc func changeLocale(_ sender: UISegmentedControl) {
+        formattedDateLabel.text = getLocalizedText(from: rawDateTextField.text)
+    }
+    
+    @objc func dateInputDidChange(_ sender: UITextField) {
+        formattedDateLabel.text = getLocalizedText(from: sender.text)
+    }
+    
+    @objc func measureValue1DidChange(_ sender: UITextField) {
+        guard let text = sender.text,
+              let doubleValue = Double(text) else {
+            isValue1Filled = false
+            return
+        }
+        value1 = Measurement(value: doubleValue, unit: value1Type)
+        isValue1Filled = true
+    }
+    
+    @objc func measureValue2DidChange(_ sender: UITextField) {
+        guard let text = sender.text,
+              let doubleValue = Double(text) else {
+            isValue2Filled = false
+            return
+        }
+        value2 = Measurement(value: doubleValue, unit: value2Type)
+        isValue2Filled = true
+    }
+    
+    @objc func changeMeasureValue1Type(_ sender: UISegmentedControl) {
+        value1Type = Value1Type(rawValue: sender.selectedSegmentIndex)!.getUnitLength()
+        measureValue1TextField.text = nil
+        isValue1Filled = false
+        
+    }
+    
+    @objc func changeMeasureValue2Type(_ sender: UISegmentedControl) {
+        value2Type = Value2Type(rawValue: sender.selectedSegmentIndex)!.getUnitLength()
+        measureValue2TextField.text = nil
+        isValue2Filled = false
+    }
 
-    private func setupLayout() {
+}
+
+// MARK: - Layout
+
+private extension ViewController {
+    
+    func setupLayout() {
         view.addSubview(upperContainerView)
         view.addSubview(lowerContainerView)
         upperContainerView.addSubview(upperLabel)
@@ -87,7 +201,7 @@ class ViewController: UIViewController {
             rawDateTextField.topAnchor.constraint(equalTo: localizeSegmentedControl.bottomAnchor, constant: 32),
             rawDateTextField.centerXAnchor.constraint(equalTo: upperContainerView.centerXAnchor),
             rawDateTextField.widthAnchor.constraint(equalToConstant: 300),
-            rawDateTextField.heightAnchor.constraint(equalToConstant: 100),
+            rawDateTextField.heightAnchor.constraint(equalToConstant: 44),
             
             formattedDateLabel.topAnchor.constraint(equalTo: rawDateTextField.bottomAnchor, constant: 32),
             formattedDateLabel.leadingAnchor.constraint(equalTo: upperContainerView.leadingAnchor, constant: 16),
@@ -121,68 +235,4 @@ class ViewController: UIViewController {
             resultMeasureLabel.trailingAnchor.constraint(equalTo: lowerContainerView.trailingAnchor, constant: -16)
         ])
     }
-    
-    private func getLocale(dependsOf index: Int) -> Locale {
-        var locale = Locale(identifier: "ru_RU")
-        switch index {
-        case 0: locale = Locale(identifier: "ru_RU")
-        case 1: locale = Locale(identifier: "en")
-        case 2: locale = Locale(identifier: "zh_CN")
-        case 3: locale = Locale(identifier: "ja")
-        case 4: locale = Locale(identifier: "de_DE")
-        case 5: locale = Locale(identifier: "it")
-        default: locale = Locale(identifier: "el")
-        }
-        return locale
-    }
-    
-    private func getLocalizedText(from optionalText: String?) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd/MM/yyyy"
-        
-        guard let text = optionalText,
-              let date = dateFormatter.date(from: text) else {
-            return "Check input data 🤷‍♀️"
-        }
-        let locale = getLocale(dependsOf: localizeSegmentedControl.selectedSegmentIndex)
-        dateFormatter.locale = locale
-        dateFormatter.setLocalizedDateFormatFromTemplate(template)
-        return dateFormatter.string(from: date)
-        
-    }
-    
-    // MARK: - Actions
-    
-    @objc func changeLocale(_ sender: UISegmentedControl) {
-        formattedDateLabel.text = getLocalizedText(from: rawDateTextField.text)
-    }
-    
-    @objc func dateInputDidChange(_ sender: UITextField) {
-        formattedDateLabel.text = getLocalizedText(from: sender.text)
-    }
-    
-    @objc func measureValue1DidChange(_ sender: UITextField) {
-        guard let text = sender.text,
-              let doubleValue = Double(text) else {
-            return
-        }
-        value1 = Measurement(value: doubleValue, unit: UnitLength.kilometers)
-        print("value1: \(value1)")
-    }
-    
-    @objc func measureValue2DidChange(_ sender: UITextField) {
-        guard let text = sender.text,
-              let doubleValue = Double(text) else {
-            return
-        }
-        value2 = Measurement(value: doubleValue, unit: UnitLength.miles)
-        print("value2: \(value2)")
-    }
-    
-    @objc func changeMeasureValue1Type(_ sender: UISegmentedControl) {
-    }
-    
-    @objc func changeMeasureValue2Type(_ sender: UISegmentedControl) {
-    }
-
 }

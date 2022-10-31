@@ -11,7 +11,7 @@ final class UIFactory {
     static var titleLabel: UILabel {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .boldSystemFont(ofSize: 48)
+        label.font = .boldSystemFont(ofSize: 36)
         label.textColor = .white
         return label
     }
@@ -33,6 +33,7 @@ final class UIFactory {
         textLabel.font = .boldSystemFont(ofSize: 24)
         textLabel.textColor = .white
         textLabel.textAlignment = .center
+        textLabel.text = "Check input data 🤷‍♀️"
         return textLabel
     }
     
@@ -40,12 +41,17 @@ final class UIFactory {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(
-            string: "dd/mm/yyyy",
+            string: "DD/MM/YYYY",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray2]
         )
-        textField.font = .boldSystemFont(ofSize: 48)
+        textField.font = .boldSystemFont(ofSize: 24)
         textField.textColor = .white
+        textField.backgroundColor = .systemMint
         textField.textAlignment = .center
+        textField.borderStyle = .roundedRect
+        textField.layer.borderColor = UIColor.white.cgColor
+        textField.layer.borderWidth = 2
+        textField.layer.cornerRadius = 5
         return textField
     }
     
@@ -53,13 +59,13 @@ final class UIFactory {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.attributedPlaceholder = NSAttributedString(
-            string: "value.0",
+            string: "VALUE",
             attributes: [NSAttributedString.Key.foregroundColor: UIColor.systemGray2]
         )
         textField.font = .boldSystemFont(ofSize: 24)
         textField.textColor = .white
         textField.backgroundColor = .systemYellow
-        textField.textAlignment = .left
+        textField.textAlignment = .center
         textField.borderStyle = .roundedRect
         textField.layer.borderColor = UIColor.white.cgColor
         textField.layer.borderWidth = 2

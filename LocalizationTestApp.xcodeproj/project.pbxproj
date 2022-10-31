@@ -13,6 +13,7 @@
 		F740DACA290A8A8F00D88899 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F740DAC9290A8A8F00D88899 /* ViewController.swift */; };
 		F740DACF290A8A9300D88899 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F740DACE290A8A9300D88899 /* Assets.xcassets */; };
 		F740DAD2290A8A9300D88899 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F740DAD0290A8A9300D88899 /* LaunchScreen.storyboard */; };
+		F7C466E7290FFA9600F25103 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7C466E6290FFA9600F25103 /* Models.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +39,7 @@
 		F740DAD1290A8A9300D88899 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F740DAD3290A8A9300D88899 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F7A2497C290AC14300C49C53 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
+		F7C466E6290FFA9600F25103 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				F740DAC7290A8A8F00D88899 /* SceneDelegate.swift */,
 				F740DAC9290A8A8F00D88899 /* ViewController.swift */,
 				F71C38F2290EAA4600EF16FB /* UIFactory.swift */,
+				F7C466E6290FFA9600F25103 /* Models.swift */,
 				F740DACE290A8A9300D88899 /* Assets.xcassets */,
 				F740DAD0290A8A9300D88899 /* LaunchScreen.storyboard */,
 				F740DAD3290A8A9300D88899 /* Info.plist */,
@@ -165,6 +168,7 @@
 				F740DACA290A8A8F00D88899 /* ViewController.swift in Sources */,
 				F740DAC6290A8A8F00D88899 /* AppDelegate.swift in Sources */,
 				F740DAC8290A8A8F00D88899 /* SceneDelegate.swift in Sources */,
+				F7C466E7290FFA9600F25103 /* Models.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
